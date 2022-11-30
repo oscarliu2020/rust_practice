@@ -1,6 +1,6 @@
-
+#[derive(Debug)]
 enum List<T>{
-    Cons(T,Rc<List<T>>),
+    Cons(Rc<RefCell<T>>,Rc<List<T>>),
     NIL
 }
 struct MyBox<T>(T);
@@ -21,7 +21,7 @@ impl<T> Deref for MyBox<T>
         &self.0
     }
 }
-use std::{ops::Deref, fmt::Display, rc::Rc, cell::RefCell};
+use std::{ops::Deref, fmt::Display, rc::Rc, cell::RefCell, borrow::Borrow};
 
 use List::{Cons,NIL};
 fn hello(a:&str){
@@ -43,15 +43,20 @@ fn main() {
     }
     
     {
-        let a=Rc::new(Cons(5,Rc::new(NIL)));
+        let x=Rc::new(RefCell::new(5));
+        let a=Rc::new(Cons(Rc::clone(&x), Rc::new(NIL)));
         println!("{}",Rc::strong_count(&a));
-        let b=Cons(3,Rc::clone(&a));
+        println!("{:?}",a);
+        let b=Cons(Rc::new(RefCell::new(3)),Rc::clone(&a));
         println!("{}",Rc::strong_count(&a));
+        println!("{:?}",b);
         {
-            let b=Cons(3,Rc::clone(&a));
+            let c=Cons(Rc::new(RefCell::new(4)),Rc::clone(&a));
             println!("{}",Rc::strong_count(&a));
+            println!("{:?}",c);
         }
-        println!("{}",Rc::strong_count(&a));
+        *(x.borrow_mut())+=100;
+        println!("{:?}",b);
     }
 }
 #[cfg(test)]
