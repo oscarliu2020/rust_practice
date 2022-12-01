@@ -1,23 +1,18 @@
+use std::collections::btree_map::ValuesMut;
 use std::{thread, time::Duration, vec};
-
+use std::sync::mpsc;
 fn main(){
-    {
-        let handle =thread::spawn(||{
-        for i in 1..10{
-            println!("from thread:{}",i);
-            thread::sleep(Duration::from_millis(1));
+    let (tx,rx)=mpsc::channel();
+    let hd=thread::spawn(move ||{
+        let vals=vec!["a".to_string(),"b".to_string(),"c".to_string()];
+        for val in vals
+        {
+            tx.send(val).unwrap();
+            thread::sleep(Duration::from_millis(1000));
         }
-        });
-        for i in 1..5{
-            println!("from main:{}",i);
-            thread::sleep(Duration::from_millis(1));
-        }
-        handle.join().unwrap();
+        
+    });
+    for recv in rx.iter(){
+        println!("{recv}");
     }
-    {
-        let v=vec![1,2,3];
-        let handle=thread::spawn( move ||{println!("{v:?}")});
-        handle.join().unwrap();
-    }
-    
 }
