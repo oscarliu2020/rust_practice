@@ -1,22 +1,35 @@
-use std::{sync::{Mutex,Arc}, thread};
-use std::time::Duration;
-use std::rc::Rc;
 fn main(){
-    let counter=Arc::new(Mutex::new(0));
-    let mut  handles=vec![];
-    for  _ in 0..10{
-        let counter=Arc::clone(&counter);
-        let handle=thread::spawn(move ||{
-            let mut  num=counter.lock().unwrap();
-            *num+=1;
-
-        });
-        handles.push(handle);
+    let  x=String::from("hello");
+    let y=Some(x);
+    let r=&y;
+    match r{
+        Some(ref e)=>{},
+        None=>{}
     }
-    for h in handles{
-        h.join().unwrap();
+    println!("{y:?}");
+    {
+        #[derive(Debug)]
+        struct P{
+            x:i32,
+            y:i32,
+            l:String
+        }
+        let p=P{
+            x:1,
+            y:2,
+            l:"abc".to_string(),
+        };
+        match p {
+            P{x:ref a,y:ref b,l: c}=>(),
+            _=>{}
+        }
     }
-    println!("{}",*counter.lock().unwrap());
-    let q=vec![1,2,3];
-    let x:i32=q.iter().sum();
+    {
+    
+    }
+    
+}
+fn test((x,y):&mut (usize,String)){
+    *x=1000;
+    y.push('a');
 }
